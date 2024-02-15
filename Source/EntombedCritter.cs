@@ -18,13 +18,29 @@ namespace EntombedCritter
             {
             }
 
+            delegate bool IsValidDigCellDelegate(DiggerMonitor.Instance instance, int cell, object arg);
+            private static readonly IsValidDigCellDelegate isValidDigCellDelegate
+                = AccessTools.MethodDelegate<IsValidDigCellDelegate>(
+                    AccessTools.Method(typeof(DiggerMonitor.Instance), "IsValidDigCell"));
+
             public bool IsEntombed()
             {
+                int cell = Grid.PosToCell(this);
+                if( !Grid.IsSolidCell(cell))
+                    return false;
                 if(HasTag(GameTags.Creatures.Burrowed))
-                    return false;
+                {
+                    // Hatches can unburrow even from built tiles, but there must be room above.
+                    if( gameObject.GetSMI<BurrowMonitor.Instance>().EmergeIsClear())
+                        return false;
+                }
                 if (smi.HasTag(GameTags.Creatures.Digger))
-                    return false;
-                return Grid.IsSolidCell(Grid.PosToCell(this));
+                {
+                    // Shove voles can get out of almost everything.
+                    if( isValidDigCellDelegate(gameObject.GetSMI<DiggerMonitor.Instance>(), Grid.PosToCell(this), null))
+                        return false;
+                }
+                return true;
             }
         }
 
