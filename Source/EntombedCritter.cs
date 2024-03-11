@@ -40,6 +40,9 @@ namespace EntombedCritter
                     if( isValidDigCellDelegate(gameObject.GetSMI<DiggerMonitor.Instance>(), Grid.PosToCell(this), null))
                         return false;
                 }
+                // Avoid warning when carried and inside the Airlock door (from the mod).
+                if( smi.HasTag(GameTags.Creatures.Bagged))
+                    return false;
                 return true;
             }
         }
