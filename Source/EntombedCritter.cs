@@ -73,6 +73,9 @@ namespace EntombedCritter
         [HarmonyPatch(nameof(AddCreatureBrain))]
         public static void AddCreatureBrain(GameObject prefab, ChoreTable.Builder chore_table, Tag species, string symbol_prefix)
         {
+            // Hives are technically creatures, but the warning is annoying there and probably(?) does not make much sense.
+            if( prefab.GetComponent<HiveWorkableEmpty>() != null )
+                return;
             // This should check !HasTag(GameTags.Robot), but at least for rovers that is set only after
             // this function is called :(. So try to get based on the species, which is hackish, but seems to work.
             if( species.Name.EndsWith("Species"))
